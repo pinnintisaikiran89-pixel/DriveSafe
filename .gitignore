@@ -1,6 +1,19 @@
+# Node Modules
 node_modules/
-.env
-__pycache__/
+
+# Python
 venv/
-dist/
+__pycache__/
+
+# Environment Files
+.env
+
+# Model Files
+*.pkl
+
+# Build Files
 build/
+
+# OS Files
+.DS_Store
+Thumbs.db
