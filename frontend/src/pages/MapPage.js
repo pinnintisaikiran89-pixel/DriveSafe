@@ -1,257 +1,259 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
 
+import { useEffect, useMemo, useState } from "react";
+import axios from "axios";
 import {
-  GoogleMap,
-  Marker,
-  useJsApiLoader
-} from "@react-google-maps/api";
+  MapPin,
+  Search,
+  RefreshCw,
+  AlertTriangle,
+  ShieldCheck,
+  Activity,
+} from "lucide-react";
+
+import PageLayout from "../layouts/PageLayout";
+import TopHeader from "../components/common/TopHeader";
+import GoogleMapComponent from "../components/GoogleMapComponent";
+
+const API_URL = "http://127.0.0.1:8000/hotspots";
 
 function MapPage() {
-
   const [hotspots, setHotspots] = useState([]);
+  const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  // Google Maps Loader
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-
-    googleMapsApiKey:
-      "AIzaSyBrCwp1IQXYoIUDbhHaM6z5kI2CzaFiWn0",
-
-    libraries: ["places"],
-  });
-
-  // Andhra Pradesh Center
-  const mapCenter = {
-    lat: 15.9129,
-    lng: 79.7400
-  };
-
-  useEffect(() => {
-
-    fetchHotspots();
-
-  }, []);
-
-  // Fetch Backend Hotspots
   const fetchHotspots = async () => {
+    setLoading(true);
+    setError("");
 
     try {
-
-      const response = await axios.get(
-        "http://127.0.0.1:5000/hotspots"
+      const response = await axios.get(API_URL, { timeout: 8000 });
+      const data = response.data;
+      const list = Array.isArray(data) ? data : data?.hotspots;
+      setHotspots(Array.isArray(list) ? list : []);
+    } catch (err) {
+      setError(
+        err.code === "ECONNABORTED"
+          ? "The hotspot service took too long to respond."
+          : "Unable to load hotspots. Check that your backend is running."
       );
-
-      setHotspots(response.data);
-
-    } catch (error) {
-
-      console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Loading Screen
-  if (!isLoaded) {
+  useEffect(() => {
+    fetchHotspots();
+  }, []);
 
-    return (
+  const filteredHotspots = useMemo(() => {
+    const term = search.trim().toLowerCase();
 
-      <div className="min-h-screen bg-black flex items-center justify-center">
+    if (!term) return hotspots;
 
-        <h1 className="text-white text-3xl font-bold">
-
-          Loading Map...
-
-        </h1>
-
-      </div>
+    return hotspots.filter((spot) =>
+      String(spot.name || spot.location || spot.place || "")
+        .toLowerCase()
+        .includes(term)
     );
-  }
+  }, [hotspots, search]);
+
+  const accidentCount = hotspots.reduce(
+    (sum, spot) => sum + (Number(spot.accidents) || 0),
+    0
+  );
+
+  const highRiskCount = hotspots.filter((spot) => {
+    const risk = String(spot.risk || spot.risk_level || "").toLowerCase();
+    return risk.includes("high") || risk.includes("critical");
+  }).length;
 
   return (
-
-    <div className="min-h-screen bg-black text-white">
-
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-6">
-
-        <div>
-
-          <h1 className="text-5xl font-black">
-
-            Smart Hotspots
-
-          </h1>
-
-          <p className="text-gray-400 mt-2">
-
-            AI Accident Monitoring System
-
-          </p>
-
-        </div>
-
-        {/* Logo */}
-        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center">
-
-          <h1 className="text-black text-3xl font-black">
-
-            D
-
-          </h1>
-
-        </div>
-
-      </div>
-
-      {/* Analytics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-6 mb-8">
-
-        <div className="bg-[#111111] border border-gray-800 rounded-3xl p-8">
-
-          <h1 className="text-5xl font-black text-red-400">
-
-            {hotspots.length}
-
-          </h1>
-
-          <p className="text-gray-400 mt-4 text-lg">
-
-            Active Hotspots
-
-          </p>
-
-        </div>
-
-        <div className="bg-[#111111] border border-gray-800 rounded-3xl p-8">
-
-          <h1 className="text-5xl font-black text-green-400">
-
-            24/7
-
-          </h1>
-
-          <p className="text-gray-400 mt-4 text-lg">
-
-            AI Monitoring
-
-          </p>
-
-        </div>
-
-        <div className="bg-[#111111] border border-gray-800 rounded-3xl p-8">
-
-          <h1 className="text-5xl font-black text-blue-400">
-
-            AI
-
-          </h1>
-
-          <p className="text-gray-400 mt-4 text-lg">
-
-            Smart Risk Detection
-
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* Hotspot List */}
-      <div className="px-6 mb-8">
-
-        <div className="bg-[#111111]/90 border border-gray-800 rounded-[2rem] p-6">
-
-          <h2 className="text-3xl font-black mb-6">
-
-            Dangerous Areas
-
-          </h2>
-
-          <div className="space-y-4">
-
-            {
-              hotspots.map((spot, index) => (
-
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-black border border-gray-800 rounded-2xl p-5"
-                >
-
-                  <div>
-
-                    <h2 className="text-2xl font-bold">
-
-                      {spot.name}
-
-                    </h2>
-
-                    <p className="text-gray-400 mt-1">
-
-                      Accident Risk Zone
-
-                    </p>
-
-                  </div>
-
-                  <div
-                    className={`px-5 py-2 rounded-xl font-bold text-lg
-                    ${
-                      spot.risk === "High"
-                        ? "bg-red-500 text-black"
-                        : "bg-yellow-400 text-black"
-                    }`}
-                  >
-
-                    {spot.risk}
-
-                  </div>
-
-                </div>
-
-              ))
-            }
-
+    <PageLayout>
+      <TopHeader
+        greeting="Drive Safe"
+        name="Road Safety Map"
+        subtitle="Explore accident hotspots and plan safer journeys."
+      />
+
+      <section className="mt-7">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-red-400/20 bg-red-500/10">
+            <MapPin className="h-5 w-5 text-red-400" />
           </div>
 
-        </div>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-lg font-bold">Accident hotspots</h1>
+            <p className="mt-1 text-xs text-white/45">
+              Explore higher-risk locations
+            </p>
+          </div>
 
-      </div>
-
-      {/* Google Map */}
-      <div className="px-6 pb-8">
-
-        <div className="overflow-hidden rounded-[2rem] border border-gray-800 shadow-2xl">
-
-          <GoogleMap
-            mapContainerStyle={{
-              width: "100%",
-              height: "70vh"
-            }}
-            center={mapCenter}
-            zoom={7}
+          <button
+            type="button"
+            onClick={fetchHotspots}
+            disabled={loading}
+            aria-label="Refresh hotspots"
+            className="rounded-xl border border-white/10 bg-white/[0.04] p-3 text-white/70 disabled:opacity-50"
           >
-
-            {
-              hotspots.map((spot, index) => (
-
-                <Marker
-                  key={index}
-                  position={{
-                    lat: spot.lat,
-                    lng: spot.lng
-                  }}
-                  title={`${spot.name} - ${spot.risk}`}
-                />
-
-              ))
-            }
-
-          </GoogleMap>
-
+            <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+          </button>
         </div>
 
-      </div>
+        <div className="grid grid-cols-3 gap-2.5">
+          <Stat label="Hotspots" value={loading ? "—" : hotspots.length} />
+          <Stat label="Accidents" value={loading ? "—" : accidentCount} />
+          <Stat label="High risk" value={loading ? "—" : highRiskCount} />
+        </div>
+      </section>
 
+      <section className="mt-5">
+        <div className="flex items-center gap-3 rounded-2xl border border-white/[0.09] bg-[#111722] px-4 py-3.5 focus-within:border-red-400/40">
+          <Search className="h-4 w-4 shrink-0 text-white/40" />
+          <input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search accident hotspots..."
+            aria-label="Search accident hotspots"
+            className="w-full bg-transparent text-sm text-white outline-none placeholder:text-white/30"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="text-xs text-white/50"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-3xl border border-white/[0.09] bg-[#11141b] p-3.5">
+        <div className="mb-3 flex items-center gap-3 px-1">
+          <Activity className="h-5 w-5 text-red-400" />
+          <div>
+            <h2 className="text-sm font-bold">Live safety map</h2>
+            <p className="mt-1 text-[11px] text-white/40">
+              Accident-prone locations
+            </p>
+          </div>
+        </div>
+
+        <div className="min-h-[300px] overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0b1018]">
+          <GoogleMapComponent hotspots={filteredHotspots} />
+        </div>
+
+        <p className="mt-3 px-1 text-[11px] leading-5 text-white/40">
+          Map information depends on the hotspot data available from your backend.
+        </p>
+      </section>
+
+      <section className="mt-6">
+        <h2 className="text-base font-bold">Nearby hotspots</h2>
+        <p className="mt-1 text-xs text-white/40">
+          {loading ? "Loading locations..." : `${filteredHotspots.length} locations found`}
+        </p>
+
+        {error && (
+          <div className="mt-4 rounded-2xl border border-red-400/20 bg-red-500/[0.07] p-4">
+            <div className="flex gap-3">
+              <AlertTriangle className="h-5 w-5 shrink-0 text-red-400" />
+              <div>
+                <p className="text-sm font-semibold">Unable to load hotspots</p>
+                <p className="mt-1 text-xs leading-5 text-white/50">{error}</p>
+                <button
+                  onClick={fetchHotspots}
+                  className="mt-3 rounded-xl bg-red-500 px-4 py-2 text-xs font-semibold"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {loading && hotspots.length === 0 && !error && (
+          <p className="mt-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 text-sm text-white/50">
+            Loading accident locations...
+          </p>
+        )}
+
+        {!loading && !error && filteredHotspots.length === 0 && (
+          <div className="mt-4 rounded-2xl border border-white/[0.08] bg-white/[0.03] p-6 text-center">
+            <MapPin className="mx-auto h-7 w-7 text-white/30" />
+            <p className="mt-3 text-sm font-semibold">
+              {search ? "No matching hotspots" : "No hotspots available"}
+            </p>
+            <p className="mt-1 text-xs text-white/40">
+              {search ? "Try another location name." : "Hotspot data will appear here when available."}
+            </p>
+          </div>
+        )}
+
+        <div className="mt-4 space-y-3">
+          {filteredHotspots.map((spot, index) => (
+            <HotspotItem
+              key={spot.id || spot._id || `${spot.name || "spot"}-${index}`}
+              spot={spot}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-2xl border border-red-400/15 bg-red-500/[0.06] p-4">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+          <div>
+            <h3 className="text-sm font-semibold">Drive with awareness</h3>
+            <p className="mt-1 text-xs leading-5 text-white/45">
+              Maintain a safe speed and follow road signs, especially in unfamiliar areas.
+            </p>
+          </div>
+        </div>
+      </section>
+    </PageLayout>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-3">
+      <p className="text-xl font-bold">{value}</p>
+      <p className="mt-1 text-[10px] font-medium text-white/40">{label}</p>
+    </div>
+  );
+}
+
+function HotspotItem({ spot }) {
+  const name = spot.name || spot.location || spot.place || "Accident hotspot";
+  const accidents = Number(spot.accidents) || 0;
+  const risk = String(spot.risk || spot.risk_level || "Unknown");
+  const value = risk.toLowerCase();
+
+  const riskClass =
+    value.includes("high") || value.includes("critical")
+      ? "border-red-400/20 bg-red-500/10 text-red-300"
+      : value.includes("medium") || value.includes("moderate")
+      ? "border-amber-400/20 bg-amber-500/10 text-amber-300"
+      : "border-white/10 bg-white/[0.05] text-white/60";
+
+  return (
+    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.035] p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-red-400/15 bg-red-500/[0.08]">
+          <MapPin className="h-5 w-5 text-red-400" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="truncate text-sm font-semibold">{name}</h3>
+          <p className="mt-1 text-xs text-white/40">
+            {accidents} recorded accident{accidents === 1 ? "" : "s"}
+          </p>
+        </div>
+        <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[10px] font-semibold ${riskClass}`}>
+          {risk}
+        </span>
+      </div>
     </div>
   );
 }

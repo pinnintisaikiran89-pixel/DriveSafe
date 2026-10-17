@@ -1,81 +1,301 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import joblib
-import numpy as np
 
-# Initialize Flask App
+import joblib
+import pandas as pd
+
+
+# ============================================================
+# INITIALIZE FLASK APP
+# ============================================================
+
 app = Flask(__name__)
 
-# Enable CORS
 CORS(app)
 
-# Load Trained ML Model
+
+# ============================================================
+# LOAD TRAINED PIPELINE
+# ============================================================
+
 model = joblib.load("model.pkl")
 
-# Severity Labels
-severity_labels = {
-    0: "Minor",
-    1: "Serious",
-    2: "Fatal"
-}
+print("Model pipeline loaded successfully.")
 
-# Home Route
-@app.route('/')
+
+# ============================================================
+# HOME ROUTE
+# ============================================================
+
+@app.route("/")
 def home():
 
     return jsonify({
         "message": "DriveSafe ML Service Running"
     })
 
-# Prediction Route
-@app.route('/predict', methods=['POST'])
+
+# ============================================================
+# HEALTH CHECK ROUTE
+# ============================================================
+
+@app.route("/health")
+def health():
+
+    return jsonify({
+        "status": "healthy",
+        "model_loaded": model is not None
+    })
+
+
+# ============================================================
+# PREDICTION ROUTE
+# ============================================================
+
+@app.route("/predict", methods=["POST"])
 def predict():
 
     try:
 
-        # Get JSON data from frontend
-        data = request.json
+        # ----------------------------------------------------
+        # Get JSON data
+        # ----------------------------------------------------
 
-        # Extract values
-        weather = int(data['weather'])
-        road_type = int(data['road_type'])
-        speed = int(data['speed'])
-        age = int(data['age'])
-        alcohol = int(data['alcohol'])
+        data = request.get_json()
 
-        # Create input array
-        input_data = np.array([
-            [
-                weather,
-                road_type,
-                speed,
-                age,
-                alcohol
-            ]
-        ])
+        print("\n========================================")
+        print("ML PREDICTION REQUEST")
+        print("========================================")
 
-        # Predict using ML model
+        print(data)
+
+
+        # ----------------------------------------------------
+        # Validate request
+        # ----------------------------------------------------
+
+        if not data:
+
+            return jsonify({
+                "error": "No data received."
+            }), 400
+
+
+        required_fields = [
+            "weather",
+            "road_type",
+            "road_condition",
+            "lighting",
+            "traffic_control",
+            "speed_limit",
+            "age",
+            "gender",
+            "license_status",
+            "alcohol",
+            "vehicle_type"
+        ]
+
+
+        missing_fields = [
+            field
+            for field in required_fields
+            if field not in data
+        ]
+
+
+        if missing_fields:
+
+            return jsonify({
+                "error": "Missing required fields.",
+                "fields": missing_fields
+            }), 400
+
+
+        # ----------------------------------------------------
+        # Create DataFrame
+        # ----------------------------------------------------
+
+        input_data = pd.DataFrame([{
+
+            "Weather Conditions":
+                data["weather"],
+
+            "Road Type":
+                data["road_type"],
+
+            "Road Condition":
+                data["road_condition"],
+
+            "Lighting Conditions":
+                data["lighting"],
+
+            "Traffic Control Presence":
+                data["traffic_control"],
+
+            "Speed Limit (km/h)":
+                float(data["speed_limit"]),
+
+            "Driver Age":
+                int(data["age"]),
+
+            "Driver Gender":
+                data["gender"],
+
+            "Driver License Status":
+                data["license_status"],
+
+            "Alcohol Involvement":
+                data["alcohol"],
+
+            "Vehicle Type Involved":
+                data["vehicle_type"]
+
+        }])
+
+
+        print("\n========================================")
+        print("MODEL INPUT")
+        print("========================================")
+
+        print(input_data)
+
+
+        # ----------------------------------------------------
+        # Make prediction
+        # ----------------------------------------------------
+
         prediction = model.predict(input_data)
 
-        # Convert prediction to label
-        result = severity_labels[int(prediction[0])]
+        predicted_severity = str(prediction[0])
 
-        # Send response
+
+        # ----------------------------------------------------
+        # Calculate confidence
+        # ----------------------------------------------------
+
+        confidence = None
+
+        if hasattr(model, "predict_proba"):
+
+            probabilities = model.predict_proba(
+                input_data
+            )[0]
+
+            confidence = round(
+                float(max(probabilities)) * 100,
+                2
+            )
+
+
+        # ----------------------------------------------------
+        # Get probabilities for every class
+        # ----------------------------------------------------
+
+        probability_details = {}
+
+        if (
+            hasattr(model, "predict_proba")
+            and hasattr(model, "classes_")
+        ):
+
+            probabilities = model.predict_proba(
+                input_data
+            )[0]
+
+            for class_name, probability in zip(
+                model.classes_,
+                probabilities
+            ):
+
+                probability_details[str(class_name)] = round(
+                    float(probability) * 100,
+                    2
+                )
+
+
+        # ----------------------------------------------------
+        # Determine risk level
+        # ----------------------------------------------------
+
+        if predicted_severity == "Fatal":
+
+            risk_level = "High"
+
+        elif predicted_severity == "Serious":
+
+            risk_level = "Medium"
+
+        elif predicted_severity == "Minor":
+
+            risk_level = "Low"
+
+        else:
+
+            risk_level = "Unknown"
+
+
+        # ----------------------------------------------------
+        # Final response
+        # ----------------------------------------------------
+
+        response = {
+
+            "accident_severity":
+                predicted_severity,
+
+            "risk_level":
+                risk_level,
+
+            "confidence":
+                confidence,
+
+            "probabilities":
+                probability_details
+
+        }
+
+
+        print("\n========================================")
+        print("ML RESULT")
+        print("========================================")
+
+        print(response)
+
+
+        return jsonify(response), 200
+
+
+    # ========================================================
+    # ERROR HANDLING
+    # ========================================================
+
+    except ValueError as e:
+
+        print("VALUE ERROR:", str(e))
+
         return jsonify({
-            "accident_severity": result
-        })
+            "error": "Invalid numeric value.",
+            "details": str(e)
+        }), 400
+
 
     except Exception as e:
 
+        print("ML ERROR:", str(e))
+
         return jsonify({
             "error": str(e)
-        })
+        }), 500
 
-# Run Flask Server
-if __name__ == '__main__':
+
+# ============================================================
+# RUN SERVER
+# ============================================================
+
+if __name__ == "__main__":
 
     app.run(
-        host='0.0.0.0',
+        host="0.0.0.0",
         port=5000,
         debug=True
     )

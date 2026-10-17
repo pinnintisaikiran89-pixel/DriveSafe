@@ -1,6 +1,16 @@
 import { useState } from "react";
 import API from "../services/api";
 
+import {
+  AlertTriangle,
+  ShieldCheck,
+  Car,
+  CloudRain,
+  Route,
+  Wine,
+  Activity,
+} from "lucide-react";
+
 function PredictionForm() {
 
   const [formData, setFormData] = useState({
@@ -30,11 +40,13 @@ function PredictionForm() {
 
       setLoading(true);
 
-      const response = await API.post("/predict", formData);
+      const response = await API.post(
+        "/predict",
+        formData
+      );
 
       console.log("Backend Response:", response.data);
 
-      // Get prediction safely
       const predictionResult =
         response.data.accident_severity ||
         response.data.prediction ||
@@ -55,265 +67,427 @@ function PredictionForm() {
     }
   };
 
+  // Result Styling
+  const getResultStyles = () => {
+
+    if (result === "Fatal") {
+
+      return {
+        bg: "bg-red-50",
+        border: "border-red-200",
+        text: "text-red-600",
+        icon: <AlertTriangle size={60} />,
+        meter: "w-full bg-red-500",
+        title: "FATAL RISK",
+        description:
+          "Extreme accident probability detected. Drive carefully and avoid overspeeding.",
+      };
+    }
+
+    if (result === "Serious") {
+
+      return {
+        bg: "bg-yellow-50",
+        border: "border-yellow-200",
+        text: "text-yellow-600",
+        icon: <AlertTriangle size={60} />,
+        meter: "w-2/3 bg-yellow-500",
+        title: "SERIOUS RISK",
+        description:
+          "Moderate accident risk detected. Stay alert and follow road safety rules.",
+      };
+    }
+
+    return {
+      bg: "bg-green-50",
+      border: "border-green-200",
+      text: "text-green-600",
+      icon: <ShieldCheck size={60} />,
+      meter: "w-1/3 bg-green-500",
+      title: "LOW RISK",
+      description:
+        "Current conditions appear relatively safe for driving.",
+    };
+  };
+
+  const resultStyles = getResultStyles();
+
   return (
 
-    <div className="bg-gray-900 p-10 rounded-3xl shadow-2xl w-full max-w-3xl border border-gray-800">
+    <div className="min-h-screen bg-[#f8fafc] px-4 py-6 md:px-8">
 
-      {/* Heading */}
-
-      <h2 className="text-4xl font-black mb-10 text-center text-blue-400 tracking-wide">
-
-        AI Accident Severity Prediction
-
-      </h2>
-
-      {/* Form Grid */}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        {/* Weather */}
+      {/* Header */}
+      <div className="max-w-6xl mx-auto mb-8 flex items-center justify-between">
 
         <div>
 
-          <label className="block mb-3 text-gray-300 text-lg font-semibold">
+          <p className="text-sm text-slate-500 font-medium">
 
-            Weather
+            AI Road Safety System
 
-          </label>
+          </p>
 
-          <select
-            name="weather"
-            value={formData.weather}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-blue-500 outline-none transition"
-          >
+          <h1 className="text-3xl md:text-5xl font-bold text-slate-900 mt-2">
 
-            <option value="0">Clear</option>
-            <option value="1">Rain</option>
-            <option value="2">Fog</option>
+            Accident Risk Prediction
 
-          </select>
+          </h1>
 
         </div>
 
-        {/* Road Type */}
+        {/* Logo */}
+        <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center">
 
-        <div>
+          <h1 className="text-2xl font-bold text-slate-900">
 
-          <label className="block mb-3 text-gray-300 text-lg font-semibold">
+            D
 
-            Road Type
-
-          </label>
-
-          <select
-            name="road_type"
-            value={formData.road_type}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-blue-500 outline-none transition"
-          >
-
-            <option value="0">Highway</option>
-            <option value="1">City Road</option>
-            <option value="2">Rural Road</option>
-
-          </select>
-
-        </div>
-
-        {/* Speed */}
-
-        <div>
-
-          <label className="block mb-3 text-gray-300 text-lg font-semibold">
-
-            Speed
-
-          </label>
-
-          <input
-            type="number"
-            name="speed"
-            placeholder="Enter Speed"
-            value={formData.speed}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-blue-500 outline-none transition"
-          />
-
-        </div>
-
-        {/* Driver Age */}
-
-        <div>
-
-          <label className="block mb-3 text-gray-300 text-lg font-semibold">
-
-            Driver Age
-
-          </label>
-
-          <input
-            type="number"
-            name="age"
-            placeholder="Enter Age"
-            value={formData.age}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-blue-500 outline-none transition"
-          />
-
-        </div>
-
-        {/* Alcohol */}
-
-        <div className="md:col-span-2">
-
-          <label className="block mb-3 text-gray-300 text-lg font-semibold">
-
-            Alcohol Involvement
-
-          </label>
-
-          <select
-            name="alcohol"
-            value={formData.alcohol}
-            onChange={handleChange}
-            className="w-full p-4 rounded-xl bg-gray-800 text-white border border-gray-700 focus:border-blue-500 outline-none transition"
-          >
-
-            <option value="0">No</option>
-            <option value="1">Yes</option>
-
-          </select>
+          </h1>
 
         </div>
 
       </div>
 
-      {/* Predict Button */}
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-5 gap-6">
 
-      <button
-        onClick={predictRisk}
-        disabled={loading}
-        className="w-full mt-10 bg-blue-600 hover:bg-blue-700 p-5 rounded-2xl text-xl font-bold transition-all duration-300 shadow-lg hover:scale-[1.02]"
-      >
+        {/* Left Panel */}
+        <div className="lg:col-span-3 bg-white rounded-[28px] border border-slate-200 p-6 md:p-8 shadow-sm">
 
-        {loading ? "Analyzing Risk..." : "Predict Accident Risk"}
+          <div className="mb-8">
 
-      </button>
+            <h2 className="text-2xl font-semibold text-slate-900">
 
-      {/* Animated Result Section */}
+              Journey Information
 
-      {
-        result && (
+            </h2>
 
-          <div
-            className={`mt-10 rounded-3xl p-10 shadow-2xl text-center border transition-all duration-700 animate-pulse
+            <p className="text-slate-500 mt-2">
 
-            ${
-              result === "Fatal"
-                ? "bg-gradient-to-br from-red-700 to-red-950 border-red-400"
-                : result === "Serious"
-                ? "bg-gradient-to-br from-yellow-500 to-orange-700 border-yellow-300"
-                : "bg-gradient-to-br from-green-500 to-green-800 border-green-300"
-            }`}
-          >
-
-            {/* Title */}
-
-            <h3 className="text-4xl font-black mb-8 text-white tracking-wide">
-
-              Accident Prediction Result
-
-            </h3>
-
-            {/* Animated Icon */}
-
-            <div className="flex justify-center items-center mb-8">
-
-              {
-                result === "Fatal" ? (
-
-                  <div className="text-8xl animate-bounce">
-
-                    🚨
-
-                  </div>
-
-                ) : result === "Serious" ? (
-
-                  <div className="text-8xl animate-pulse">
-
-                    ⚠️
-
-                  </div>
-
-                ) : (
-
-                  <div className="text-8xl animate-bounce">
-
-                    ✅
-
-                  </div>
-
-                )
-              }
-
-            </div>
-
-            {/* Prediction Text */}
-
-            <h1 className="text-6xl font-extrabold text-white mb-8 tracking-widest">
-
-              {
-                result === "Fatal"
-                  ? "FATAL"
-                  : result === "Serious"
-                  ? "SERIOUS"
-                  : "MINOR"
-              }
-
-            </h1>
-
-            {/* Description */}
-
-            <p className="text-xl text-white/90 leading-9 max-w-2xl mx-auto">
-
-              {
-                result === "Fatal"
-                  ? "Extreme accident risk detected. Avoid overspeeding and drive with maximum caution."
-                  : result === "Serious"
-                  ? "Moderate accident risk detected. Stay alert and follow all traffic rules carefully."
-                  : "Low accident risk detected. Current driving conditions appear relatively safe."
-              }
+              Enter driving conditions to analyze accident severity risk.
 
             </p>
 
-            {/* Risk Meter */}
+          </div>
 
-            <div className="mt-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-              <div className="w-full bg-black/20 rounded-full h-6 overflow-hidden">
+            {/* Weather */}
+            <div>
 
-                <div
-                  className={`h-6 rounded-full transition-all duration-1000
+              <label className="flex items-center gap-2 text-slate-700 font-medium mb-3">
 
-                  ${
-                    result === "Fatal"
-                      ? "w-full bg-red-300"
-                      : result === "Serious"
-                      ? "w-2/3 bg-yellow-200"
-                      : "w-1/3 bg-green-200"
-                  }`}
-                ></div>
+                <CloudRain size={18} />
 
-              </div>
+                Weather
+
+              </label>
+
+              <select
+                name="weather"
+                value={formData.weather}
+                onChange={handleChange}
+                className="w-full h-14 px-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+              >
+
+                <option value="0">
+
+                  Clear
+
+                </option>
+
+                <option value="1">
+
+                  Rain
+
+                </option>
+
+                <option value="2">
+
+                  Fog
+
+                </option>
+
+              </select>
+
+            </div>
+
+            {/* Road Type */}
+            <div>
+
+              <label className="flex items-center gap-2 text-slate-700 font-medium mb-3">
+
+                <Route size={18} />
+
+                Road Type
+
+              </label>
+
+              <select
+                name="road_type"
+                value={formData.road_type}
+                onChange={handleChange}
+                className="w-full h-14 px-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+              >
+
+                <option value="0">
+
+                  Highway
+
+                </option>
+
+                <option value="1">
+
+                  City Road
+
+                </option>
+
+                <option value="2">
+
+                  Rural Road
+
+                </option>
+
+              </select>
+
+            </div>
+
+            {/* Speed */}
+            <div>
+
+              <label className="flex items-center gap-2 text-slate-700 font-medium mb-3">
+
+                <Car size={18} />
+
+                Vehicle Speed
+
+              </label>
+
+              <input
+                type="number"
+                name="speed"
+                placeholder="Enter Speed"
+                value={formData.speed}
+                onChange={handleChange}
+                className="w-full h-14 px-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+              />
+
+            </div>
+
+            {/* Age */}
+            <div>
+
+              <label className="flex items-center gap-2 text-slate-700 font-medium mb-3">
+
+                <Activity size={18} />
+
+                Driver Age
+
+              </label>
+
+              <input
+                type="number"
+                name="age"
+                placeholder="Enter Age"
+                value={formData.age}
+                onChange={handleChange}
+                className="w-full h-14 px-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+              />
+
+            </div>
+
+            {/* Alcohol */}
+            <div className="md:col-span-2">
+
+              <label className="flex items-center gap-2 text-slate-700 font-medium mb-3">
+
+                <Wine size={18} />
+
+                Alcohol Involvement
+
+              </label>
+
+              <select
+                name="alcohol"
+                value={formData.alcohol}
+                onChange={handleChange}
+                className="w-full h-14 px-4 rounded-2xl border border-slate-200 bg-slate-50 text-slate-700 outline-none focus:ring-2 focus:ring-blue-100"
+              >
+
+                <option value="0">
+
+                  No
+
+                </option>
+
+                <option value="1">
+
+                  Yes
+
+                </option>
+
+              </select>
 
             </div>
 
           </div>
 
-        )
-      }
+          {/* Button */}
+          <button
+            onClick={predictRisk}
+            disabled={loading}
+            className="w-full mt-8 h-14 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-semibold transition duration-300"
+          >
+
+            {
+              loading
+                ? "Analyzing Risk..."
+                : "Predict Accident Risk"
+            }
+
+          </button>
+
+        </div>
+
+        {/* Right Panel */}
+        <div className="lg:col-span-2">
+
+          <div className="bg-white rounded-[28px] border border-slate-200 p-6 md:p-8 shadow-sm h-full">
+
+            <div className="flex items-center justify-between mb-6">
+
+              <div>
+
+                <h2 className="text-2xl font-semibold text-slate-900">
+
+                  AI Result
+
+                </h2>
+
+                <p className="text-slate-500 mt-1">
+
+                  Real-time prediction output
+
+                </p>
+
+              </div>
+
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center">
+
+                <ShieldCheck
+                  className="text-slate-700"
+                  size={22}
+                />
+
+              </div>
+
+            </div>
+
+            {
+              result ? (
+
+                <div
+                  className={`${resultStyles.bg} ${resultStyles.border} border rounded-[28px] p-8 transition-all duration-500`}
+                >
+
+                  {/* Icon */}
+                  <div
+                    className={`${resultStyles.text} mb-6`}
+                  >
+
+                    {resultStyles.icon}
+
+                  </div>
+
+                  {/* Title */}
+                  <h1
+                    className={`text-3xl font-bold ${resultStyles.text}`}
+                  >
+
+                    {resultStyles.title}
+
+                  </h1>
+
+                  {/* Description */}
+                  <p className="text-slate-600 leading-8 mt-4">
+
+                    {resultStyles.description}
+
+                  </p>
+
+                  {/* Meter */}
+                  <div className="mt-8">
+
+                    <div className="w-full h-3 rounded-full bg-slate-200 overflow-hidden">
+
+                      <div
+                        className={`h-3 rounded-full transition-all duration-700 ${resultStyles.meter}`}
+                      ></div>
+
+                    </div>
+
+                  </div>
+
+                  {/* Risk Label */}
+                  <div className="mt-5 flex items-center justify-between text-sm text-slate-500">
+
+                    <span>
+
+                      Low
+
+                    </span>
+
+                    <span>
+
+                      Moderate
+
+                    </span>
+
+                    <span>
+
+                      High
+
+                    </span>
+
+                  </div>
+
+                </div>
+
+              ) : (
+
+                <div className="h-[320px] rounded-[28px] border border-dashed border-slate-300 flex flex-col items-center justify-center text-center">
+
+                  <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center mb-5">
+
+                    <ShieldCheck
+                      className="text-slate-500"
+                      size={40}
+                    />
+
+                  </div>
+
+                  <h3 className="text-xl font-semibold text-slate-800">
+
+                    No Prediction Yet
+
+                  </h3>
+
+                  <p className="text-slate-500 mt-3 max-w-xs leading-7">
+
+                    Fill the journey information and run AI analysis to view accident risk prediction.
+
+                  </p>
+
+                </div>
+
+              )
+            }
+
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
   );

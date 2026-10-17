@@ -1,0 +1,79 @@
+/* ==========================================
+   Global Styles
+   ========================================== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+
+    scroll-behavior:smooth;
+
+}
+
+body{
+
+    font-family:
+        "Inter",
+        sans-serif;
+
+    background:
+        linear-gradient(
+            180deg,
+            #F8FAFC 0%,
+            #EFF6FF 50%,
+            #FFFFFF 100%
+        );
+
+    color:var(--text-primary);
+
+    min-height:100vh;
+
+    overflow-x:hidden;
+
+}
+
+/* Links */
+
+a{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+/* Buttons */
+
+button{
+
+    cursor:pointer;
+
+    border:none;
+
+    outline:none;
+
+    transition:.3s;
+
+}
+
+/* Images */
+
+img{
+
+    width:100%;
+
+    display:block;
+
+}
+
+/* Inputs */
+
+input{
+
+    outline:none;
+
+}

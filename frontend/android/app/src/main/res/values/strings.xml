@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">DriveSafe</string>
+    <string name="title_activity_main">DriveSafe</string>
+    <string name="package_name">com.drivesafe.app</string>
+    <string name="custom_url_scheme">com.drivesafe.app</string>
+</resources>

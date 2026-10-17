@@ -1,310 +1,97 @@
-import GoogleMapComponent from "../components/GoogleMapComponent";
-import WeatherCard from "../components/WeatherCard";
 
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { LogOut, Route, ShieldCheck } from "lucide-react";
+
+import { auth } from "../firebase";
+import PageLayout from "../layouts/PageLayout";
+import TopHeader from "../components/common/TopHeader";
+import SafetyScoreCard from "../components/dashboard/SafetyScoreCard";
+import QuickActions from "../components/dashboard/QuickActions";
+import WeatherCard from "../components/dashboard/WeatherCard";
+import NearbyHotspots from "../components/dashboard/NearbyHotspots";
+import PredictionHistory from "../components/dashboard/PredictionHistory";
 
 function Dashboard() {
+  const navigate = useNavigate();
 
-  const data = [
-
-    {
-      name: "Minor",
-      accidents: 400,
-    },
-
-    {
-      name: "Serious",
-      accidents: 300,
-    },
-
-    {
-      name: "Fatal",
-      accidents: 200,
-    },
-  ];
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login", { replace: true });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
-
-    <div className="min-h-screen bg-black text-white px-6 py-8">
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-12">
-
-        <div>
-
-          <h1 className="text-5xl font-black">
-
-            Dashboard
-
-          </h1>
-
-          <p className="text-gray-400 mt-2 text-lg">
-
-            AI Powered Accident Analytics
-
-          </p>
-
+    <PageLayout>
+      <div className="flex items-start gap-3">
+        <div className="min-w-0 flex-1">
+          <TopHeader
+            greeting="Welcome back"
+            name={auth.currentUser?.displayName || "Driver"}
+            subtitle="Your driving dashboard"
+          />
         </div>
 
-        {/* Logo */}
-        <div className="w-14 h-14 rounded-2xl bg-white flex items-center justify-center">
-
-          <h1 className="text-black text-3xl font-black">
-
-            D
-
-          </h1>
-
-        </div>
-
+        <button
+          type="button"
+          onClick={handleLogout}
+          aria-label="Log out"
+          className="mt-2 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/[0.04] text-white/60 transition hover:border-red-400/30 hover:text-red-300"
+        >
+          <LogOut className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* Analytics Hero */}
-      <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-[2rem] p-10 shadow-2xl mb-12">
-
-        <p className="text-black text-xl font-medium">
-
-          Real-Time AI Monitoring
-
-        </p>
-
-        <h1 className="text-6xl font-black text-black mt-5 leading-tight">
-
-          Smart
-          <br />
-          Accident
-          <br />
-          Analytics
-
-        </h1>
-
-        <p className="text-black/70 text-lg mt-6 max-w-2xl leading-8">
-
-          Analyze accident severity trends, monitor high-risk
-          zones, and improve road safety using intelligent
-          AI-powered insights and live hotspot tracking.
-
-        </p>
-
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-
-        {/* Total Accidents */}
-        <div className="bg-[#111111] border border-gray-800 p-8 rounded-3xl shadow-2xl hover:border-blue-500 transition">
-
-          <div className="w-16 h-16 rounded-2xl bg-blue-500/20 flex items-center justify-center mb-6">
-
-            <span className="text-3xl">
-
-              🚗
-
-            </span>
-
+      <div className="mt-6 flex items-center justify-between gap-3 rounded-2xl border border-red-400/15 bg-red-500/[0.06] p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-500/10">
+            <ShieldCheck className="h-5 w-5 text-red-400" />
           </div>
-
-          <h2 className="text-gray-400 text-lg">
-
-            Total Accidents
-
-          </h2>
-
-          <p className="text-5xl font-black mt-4 text-white">
-
-            12,540
-
-          </p>
-
-        </div>
-
-        {/* Fatal Cases */}
-        <div className="bg-[#111111] border border-gray-800 p-8 rounded-3xl shadow-2xl hover:border-red-500 transition">
-
-          <div className="w-16 h-16 rounded-2xl bg-red-500/20 flex items-center justify-center mb-6">
-
-            <span className="text-3xl">
-
-              🚨
-
-            </span>
-
-          </div>
-
-          <h2 className="text-gray-400 text-lg">
-
-            Fatal Cases
-
-          </h2>
-
-          <p className="text-5xl font-black mt-4 text-red-400">
-
-            2,340
-
-          </p>
-
-        </div>
-
-        {/* High Risk Roads */}
-        <div className="bg-[#111111] border border-gray-800 p-8 rounded-3xl shadow-2xl hover:border-yellow-500 transition">
-
-          <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center mb-6">
-
-            <span className="text-3xl">
-
-              ⚠️
-
-            </span>
-
-          </div>
-
-          <h2 className="text-gray-400 text-lg">
-
-            High Risk Roads
-
-          </h2>
-
-          <p className="text-5xl font-black mt-4 text-yellow-400">
-
-            145
-
-          </p>
-
-        </div>
-
-        {/* AI Accuracy */}
-        <div className="bg-[#111111] border border-gray-800 p-8 rounded-3xl shadow-2xl hover:border-green-500 transition">
-
-          <div className="w-16 h-16 rounded-2xl bg-green-500/20 flex items-center justify-center mb-6">
-
-            <span className="text-3xl">
-
-              🤖
-
-            </span>
-
-          </div>
-
-          <h2 className="text-gray-400 text-lg">
-
-            AI Accuracy
-
-          </h2>
-
-          <p className="text-5xl font-black mt-4 text-green-400">
-
-            89%
-
-          </p>
-
-        </div>
-
-      </div>
-
-      {/* Chart Section */}
-      <div className="bg-[#111111] border border-gray-800 rounded-[2rem] p-8 shadow-2xl mb-12">
-
-        <div className="flex items-center justify-between mb-8">
-
           <div>
-
-            <h2 className="text-4xl font-black text-white">
-
-              Accident Distribution
-
-            </h2>
-
-            <p className="text-gray-400 mt-2">
-
-              Severity analysis using AI predictions
-
+            <p className="text-sm font-semibold">DriveSafe protection</p>
+            <p className="mt-1 text-xs text-white/45">
+              Check conditions before every journey.
             </p>
-
           </div>
-
-          <div className="w-14 h-14 rounded-2xl bg-blue-500/20 flex items-center justify-center">
-
-            <span className="text-3xl">
-
-              📊
-
-            </span>
-
-          </div>
-
         </div>
-
-        <ResponsiveContainer width="100%" height={400}>
-
-          <BarChart data={data}>
-
-            <XAxis dataKey="name" stroke="#9CA3AF" />
-
-            <YAxis stroke="#9CA3AF" />
-
-            <Tooltip />
-
-            <Bar
-              dataKey="accidents"
-              fill="#3B82F6"
-              radius={[12, 12, 0, 0]}
-            />
-
-          </BarChart>
-
-        </ResponsiveContainer>
-
+        <button
+          type="button"
+          onClick={() => navigate("/route-safety")}
+          aria-label="Open route safety"
+          className="rounded-xl border border-white/10 bg-white/[0.04] p-2.5 text-white/70"
+        >
+          <Route className="h-4 w-4" />
+        </button>
       </div>
 
-      {/* Map Section */}
-      <div className="bg-[#111111] border border-gray-800 rounded-[2rem] p-8 shadow-2xl">
+      <section className="mt-6">
+        <SafetyScoreCard />
+      </section>
 
-        <div className="flex items-center justify-between mb-8">
+      <section className="mt-6">
+        <QuickActions />
+      </section>
 
-          <div>
-
-            <h2 className="text-4xl font-black text-white">
-
-              Accident Hotspots
-
-            </h2>
-
-            <p className="text-gray-400 mt-2">
-
-              Live dangerous zones and AI-monitored roads
-
-            </p>
-
-          </div>
-
-          <div className="w-14 h-14 rounded-2xl bg-red-500/20 flex items-center justify-center">
-
-            <span className="text-3xl">
-
-              📍
-
-            </span>
-
-          </div>
-
-        </div>
-
-        <GoogleMapComponent />
-
-      </div>
-      <div className="mt-12">
-
+      <section className="mt-6">
         <WeatherCard />
+      </section>
 
-      </div>
-    </div>
+      <section className="mt-6">
+        <NearbyHotspots />
+      </section>
+
+      <section className="mt-6">
+        <PredictionHistory />
+      </section>
+
+      <p className="mt-6 text-center text-xs leading-5 text-white/30">
+        Drive responsibly. Risk estimates are informational and do not replace
+        road signs or your own judgment.
+      </p>
+    </PageLayout>
   );
 }
 

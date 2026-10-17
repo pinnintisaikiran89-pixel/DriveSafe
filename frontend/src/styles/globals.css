@@ -1,0 +1,274 @@
+
+/* ==========================================
+   DriveSafe Premium Dark Glass Design System
+   ========================================== */
+
+/* ===== Theme Variables ===== */
+
+:root {
+  /* Brand */
+  --primary: #ef4444;
+  --primary-dark: #dc2626;
+  --primary-light: #7f1d1d;
+
+  /* Backgrounds */
+  --background: #050505;
+  --background-secondary: #0a0a0a;
+  --surface: #111111;
+  --surface-hover: #181818;
+
+  /* Safety Colors */
+  --safe: #22c55e;
+  --safe-light: #14532d;
+
+  --warning: #facc15;
+  --warning-light: #713f12;
+
+  --danger: #ef4444;
+  --danger-light: #7f1d1d;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-light: #71717a;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.09);
+
+  /* Shadows */
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+
+  /* Radius */
+  --radius-sm: 16px;
+  --radius-md: 24px;
+  --radius-lg: 32px;
+  --radius-full: 999px;
+
+  /* Typography */
+  --font-title: 34px;
+  --font-heading: 26px;
+  --font-subheading: 20px;
+  --font-body: 16px;
+  --font-small: 14px;
+  --font-caption: 12px;
+
+  /* Font Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-black: 900;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+}
+
+/* ==========================================
+   Glass Effects
+   ========================================== */
+
+/* Main Glass Card */
+
+.glass {
+  background: rgba(255, 255, 255, 0.035);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+}
+
+/* Strong Glass */
+
+.glass-strong {
+  background: rgba(20, 20, 20, 0.88);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4);
+}
+
+/* Dark Glass */
+
+.glass-dark {
+  background: rgba(10, 10, 10, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: var(--text-primary);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Glass Card */
+
+.glass-card {
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+
+/* Hover Animation */
+
+.glass-hover {
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.glass-hover:hover {
+  transform: translateY(-4px);
+  border-color: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+}
+
+/* ==========================================
+   Global Styles
+   ========================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  font-family: "Inter", sans-serif;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgba(127, 29, 29, 0.12) 0%,
+      transparent 45%
+    ),
+    linear-gradient(
+      180deg,
+      #050505 0%,
+      #080808 50%,
+      #050505 100%
+    );
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Text Selection */
+
+::selection {
+  background: rgba(239, 68, 68, 0.3);
+  color: #ffffff;
+}
+
+/* Links */
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Buttons */
+
+button {
+  cursor: pointer;
+  font: inherit;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* Images */
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Inputs */
+
+input,
+textarea,
+select {
+  color: var(--text-primary);
+  background-color: #151515;
+  border-color: var(--border);
+  outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #71717a;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(239, 68, 68, 0.65);
+}
+
+/* Chrome Autofill */
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: #ffffff !important;
+  -webkit-box-shadow: 0 0 0 1000px #151515 inset !important;
+  caret-color: #ffffff;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Scrollbar */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #292929;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ef4444;
+}
+
+/* Focus Accessibility */
+
+:focus-visible {
+  outline: 2px solid rgba(239, 68, 68, 0.8);
+  outline-offset: 3px;
+}
+
+/* Reduced Motion */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
