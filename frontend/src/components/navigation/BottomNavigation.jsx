@@ -8,13 +8,6 @@ import {
   Plus,
 } from "lucide-react";
 
-const menus = [
-  { name: "Home", path: "/dashboard", icon: House },
-  { name: "Predict", path: "/predict", icon: Brain },
-  { name: "Route", path: "/route-safety", icon: Route },
-  { name: "Profile", path: "/profile", icon: User },
-];
-
 function BottomNavigation() {
   const navigate = useNavigate();
   const location = useLocation();

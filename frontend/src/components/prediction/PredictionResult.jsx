@@ -11,7 +11,6 @@ import {
   Construction,
   TrafficCone,
   Lightbulb,
-  Route,
   Sparkles,
 } from "lucide-react";
 
