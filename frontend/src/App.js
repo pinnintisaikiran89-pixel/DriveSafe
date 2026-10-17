@@ -29,7 +29,6 @@ function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
   const location = useLocation();
 
-  // Wait until Firebase authentication has been checked
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#080b12] text-white">
@@ -59,29 +58,13 @@ function ProtectedRoute({ children }) {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Public routes: authentication only */}
+      {/* Public routes */}
+      <Route path="/" element={<SplashScreen />} />
+      <Route path="/home" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
 
-      {/* Every other route requires login */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <SplashScreen />
-          </ProtectedRoute>
-        }
-      />
-
-      <Route
-        path="/home"
-        element={
-          <ProtectedRoute>
-            <Home />
-          </ProtectedRoute>
-        }
-      />
-
+      {/* Protected routes */}
       <Route
         path="/dashboard"
         element={
@@ -145,15 +128,8 @@ function AppRoutes() {
         }
       />
 
-      {/* Unknown routes also require login */}
-      <Route
-        path="*"
-        element={
-          <ProtectedRoute>
-            <Navigate to="/dashboard" replace />
-          </ProtectedRoute>
-        }
-      />
+      {/* Unknown URLs go to Home */}
+      <Route path="*" element={<Navigate to="/home" replace />} />
     </Routes>
   );
 }
@@ -162,7 +138,6 @@ function App() {
   return (
     <>
       <Toaster position="top-center" reverseOrder={false} />
-
       <BrowserRouter>
         <AppRoutes />
       </BrowserRouter>
