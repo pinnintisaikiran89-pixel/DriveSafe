@@ -31,7 +31,7 @@ function RouteForm({ setRouteResult }) {
     try {
 
       const response = await axios.post(
-        "http://127.0.0.1:8000/route/analyze",
+        "https://drivesafe-n587.onrender.com/route/analyze",
         {
           source: source.trim(),
           destination: destination.trim(),

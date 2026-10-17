@@ -44,7 +44,7 @@ function NearbyHotspots() {
 
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8000/hotspots"
+        "https://drivesafe-n587.onrender.com/hotspots"
       );
 
       const data = response.data;

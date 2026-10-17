@@ -92,7 +92,7 @@ function GoogleMapComponent() {
       setLoadingHotspots(true);
 
       const response = await axios.get(
-        "http://127.0.0.1:8000/hotspots"
+        "https://drivesafe-n587.onrender.com/hotspots"
       );
 
       console.log(
@@ -178,7 +178,7 @@ function GoogleMapComponent() {
 
         const response = await axios.post(
 
-          "http://127.0.0.1:8000/risk",
+          "https://drivesafe-n587.onrender.com/risk",
 
           {
 

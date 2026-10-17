@@ -14,7 +14,7 @@ import PageLayout from "../layouts/PageLayout";
 import TopHeader from "../components/common/TopHeader";
 import GoogleMapComponent from "../components/GoogleMapComponent";
 
-const API_URL = "http://127.0.0.1:8000/hotspots";
+const API_URL = "https://drivesafe-n587.onrender.com/hotspots";
 
 function MapPage() {
   const [hotspots, setHotspots] = useState([]);

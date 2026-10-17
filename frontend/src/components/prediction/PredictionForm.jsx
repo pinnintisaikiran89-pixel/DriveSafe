@@ -88,7 +88,7 @@ function PredictionForm({ setResult }) {
       const location = await getLocation();
 
       const predictionResponse = await axios.post(
-        "http://127.0.0.1:8000/predict",
+        "https://drivesafe-n587.onrender.com/predict",
         {
           weather,
           road_type: roadType,
@@ -112,7 +112,7 @@ function PredictionForm({ setResult }) {
       }
 
       const riskResponse = await axios.post(
-        "http://127.0.0.1:8000/risk",
+        "https://drivesafe-n587.onrender.com/risk",
         {
           ml_prediction: prediction.prediction,
           ml_confidence: prediction.confidence,

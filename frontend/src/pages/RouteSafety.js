@@ -208,7 +208,7 @@ function RouteSafety() {
 
       try {
         const riskResponse = await axios.post(
-          "http://127.0.0.1:8000/risk",
+          "https://drivesafe-n587.onrender.com/risk",
           {
             latitude: start[0],
             longitude: start[1],
